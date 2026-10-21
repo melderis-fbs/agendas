@@ -1,6 +1,9 @@
 // Lee el pipeline "Agendas" de GHL y devuelve solo lo que el tablero necesita.
 // Variables de entorno en Netlify: GHL_TOKEN (Private Integration, scope opportunities.readonly)
 // y DASH_KEY (clave que Vicky carga una vez en el tablero).
+import { CLOSERS } from '../lib/config.mjs';
+import { ghl } from '../lib/fuentes.mjs';
+
 const API = 'https://services.leadconnectorhq.com';
 const LOCATION = 'x7nYndpXUc1dmpunATsZ';
 const PIPELINE = 'Hdnl2Kgw5kRk1rCNrwYW'; // Agendas
@@ -80,7 +83,50 @@ export default async (req) => {
       searchAfter = lote[lote.length - 1].sort;
       if (pagina === 29) cortado = true;
     }
-    return json({ actualizado: new Date().toISOString(), desde, hasta, etapas, ops, cortado });
+    // Llamadas: citas de los closers con fecha en el período (calendario de GHL), con la etapa actual de su oportunidad.
+    let llamadas = [];
+    let llamadasError = null;
+    try {
+      const G = ghl(process.env);
+      const ini = new Date(`${desde}T00:00:00-03:00`).getTime();
+      const fin = new Date(`${hasta}T23:59:59-03:00`).getTime();
+      const porCloser = await Promise.all(CLOSERS.map((c) => G.citas(c.ghlUser, ini, fin).then((evs) => evs.map((ev) => ({ ev, closer: c.nombre })))));
+      const citas = porCloser.flat().filter((x) => x.ev.contactId);
+      const porContacto = new Map(ops.map((o) => [o.contactId, o]));
+      if (citas.some((x) => !porContacto.has(x.ev.contactId))) {
+        // Agendas que entraron antes del período: se buscan en una ventana de 60 días más.
+        const antes = new Date(ini - 60 * 864e5).toISOString();
+        const viejas = await G.oportunidades(antes, `${hasta}T23:59:59-03:00`);
+        const preferida = (a, b) => (b.status === 'open' || b.status === 'won') && !(a.status === 'open' || a.status === 'won') ? b : a;
+        for (const op of viejas) {
+          if (porContacto.has(op.contactId) && ops.includes(porContacto.get(op.contactId))) continue;
+          const o = {
+            id: op.id, contactId: op.contactId, nombre: op.name || (op.contact && op.contact.name) || 'Sin nombre',
+            etapa: op.pipelineStageId, estado: op.status, canal: canalDe(op), creado: op.createdAt, cambioEtapa: op.lastStageChangeAt,
+          };
+          const prev = porContacto.get(op.contactId);
+          porContacto.set(op.contactId, prev ? preferida(prev, o) : o);
+        }
+      }
+      const vistos = new Set();
+      for (const { ev, closer } of citas) {
+        const k = ev.contactId + '|' + ev.startTime;
+        if (vistos.has(k)) continue;
+        vistos.add(k);
+        const op = porContacto.get(ev.contactId);
+        llamadas.push({
+          contactId: ev.contactId,
+          nombre: op ? op.nombre : ev.title || 'Sin nombre',
+          closer,
+          inicio: new Date(ev.startTime).toISOString(),
+          etapa: op ? op.etapa : null,
+          canal: op ? op.canal : 'Sin fuente',
+        });
+      }
+    } catch (e) {
+      llamadasError = String(e.message || e);
+    }
+    return json({ actualizado: new Date().toISOString(), desde, hasta, etapas, ops, cortado, llamadas, llamadasError });
   } catch (e) {
     return json({ error: 'No se pudo hablar con GHL', detalle: String(e) }, 502);
   }

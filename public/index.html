@@ -10,13 +10,15 @@
 <style>
 :root{
   color-scheme: light dark;
-  --bg:#EEF1F4; --panel:#FFFFFF; --ink:#16202A; --muted:#5B6773; --line:#D5DBE1;
-  --flow:#1F5C73; --flow-soft:#BCD3DC; --leak:#B42318; --leak-soft:#F6D5D1; --ok:#1E7A4C; --wait:#8A6A10;
+  --bg:#F3F2F8; --panel:#FFFFFF; --panel2:#F7F6FC; --ink:#1B1830; --muted:#625E78; --line:#E1DEEC;
+  --flow:#5B47D6; --flow2:#8C7BF2; --flow-soft:#DCD6FB; --call:#0E8A72; --call2:#3CC0A3;
+  --leak:#C2410C; --leak-soft:#FBE3D6; --ok:#13875F; --wait:#A16207;
   --r:10px; --f:"Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){
-  :root{ --bg:#10161C; --panel:#18212A; --ink:#E7ECF0; --muted:#97A3AE; --line:#2A3743;
-    --flow:#6FB3CB; --flow-soft:#24414D; --leak:#F0897C; --leak-soft:#4A2220; --ok:#6CCB97; --wait:#E1C163; }
+  :root{ --bg:#0F0E17; --panel:#17152A; --panel2:#1E1B35; --ink:#ECEAF6; --muted:#A39FBD; --line:#2C2847;
+    --flow:#8B7CF6; --flow2:#B7A9FF; --flow-soft:#2E2858; --call:#2FB996; --call2:#7BE0C4;
+    --leak:#F59E6B; --leak-soft:#3A2420; --ok:#4ADE9B; --wait:#F2C25B; }
 }
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -34,28 +36,55 @@ h2{font-size:1.05rem;font-weight:700;margin:0 0 4px}
 .ctrl button,.ctrl input{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);
   border-radius:999px;padding:6px 12px;cursor:pointer}
 .ctrl input{border-radius:8px;padding:5px 8px}
-.ctrl button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ctrl button[aria-pressed=true]{background:var(--flow);color:#fff;border-color:var(--flow)}
 .ctrl .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
 button:focus-visible,input:focus-visible{outline:2px solid var(--flow);outline-offset:2px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:14px;box-shadow:0 1px 2px rgb(0 0 0 / .04),0 8px 24px -16px rgb(40 30 90 / .25)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px}
 .grid .panel{margin-top:0}
-/* embudo con fugas */
-.step{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:4px 14px;align-items:center;padding:6px 0;cursor:pointer;border-radius:8px}
-.step:hover .bar{filter:brightness(1.08)}
-.step.sel .lab b{text-decoration:underline;text-underline-offset:3px}
-.lab b{display:block;font-weight:650}
-.lab span{color:var(--muted);font-size:.82rem}
-.track{position:relative;height:34px;display:flex;align-items:center}
-.bar{height:100%;background:var(--flow);border-radius:6px 2px 2px 6px;min-width:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
-  color:#fff;font-weight:800;font-stretch:110%;font-variant-numeric:tabular-nums;font-size:1.05rem;transition:width .4s ease}
-.out{margin-left:8px;font-weight:800;font-stretch:110%;font-variant-numeric:tabular-nums;font-size:1.05rem}
+/* embudo desplegable */
+.fun-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;align-items:baseline}
+.fun-tag{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--flow)}
+#llamadas-p .fun-tag{color:var(--call)}
+.steps{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.step{border:1px solid var(--line);border-radius:12px;background:var(--panel2);overflow:hidden}
+.step.open{border-color:color-mix(in srgb,var(--flow) 55%,var(--line))}
+#llamadas-p .step.open{border-color:color-mix(in srgb,var(--call) 55%,var(--line))}
+.step-btn{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:18px minmax(130px,210px) 1fr 104px;gap:6px 14px;align-items:center;padding:12px 14px;cursor:pointer}
+.step-btn:focus-visible{outline:2px solid var(--flow);outline-offset:-2px;border-radius:12px}
+.step-btn:hover{background:color-mix(in srgb,var(--flow-soft) 30%,transparent)}
+.chev{width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .2s ease;justify-self:center}
+.step.open .chev{transform:rotate(45deg)}
+.lab b{display:block;font-weight:700}
+.lab span{color:var(--muted);font-size:.8rem}
+.track{position:relative;height:26px;display:flex;align-items:center;background:color-mix(in srgb,var(--line) 45%,transparent);border-radius:999px;overflow:hidden}
+.bar{height:100%;background:linear-gradient(90deg,var(--flow),var(--flow2));border-radius:999px;min-width:6px;transition:width .45s ease}
+#llamadas-p .bar{background:linear-gradient(90deg,var(--call),var(--call2))}
+.leak{height:100%;background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--leak) 30%,transparent) 0 5px,transparent 5px 10px)}
+.val{text-align:right;line-height:1.1}
+.val b{display:block;font-size:1.35rem;font-weight:800;font-stretch:112%;font-variant-numeric:tabular-nums}
+.val span{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.leakrow{grid-column:3/5;font-size:.8rem;color:var(--muted);margin-top:-2px}
+.leakrow.worst{color:var(--leak);font-weight:700}
+.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;padding:4px 14px 14px 46px}
+.det h3{font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:6px 0 6px}
+.det h3.perd{color:var(--leak)}
+.nlist{list-style:none;margin:0;padding:0 4px 0 0;max-height:300px;overflow:auto;scrollbar-width:thin;border-top:1px solid var(--line)}
+.nlist li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 2px;border-bottom:1px solid var(--line);font-size:.88rem}
+.nlist a{color:inherit;font-weight:600;text-decoration:none}
+.nlist a:hover{text-decoration:underline}
+.nlist small{grid-column:1/-1;color:var(--muted);font-size:.78rem}
+.nlist .vacio{color:var(--muted);display:block}
+.callnote{font-size:.85rem;color:var(--muted);margin:10px 2px 0}
+.callnote b{color:var(--wait)}
 .wrow.on{background:color-mix(in srgb,var(--flow-soft) 60%,transparent)}
-.leak{height:100%;background:repeating-linear-gradient(-45deg,var(--leak-soft) 0 6px,transparent 6px 11px);border-radius:2px 6px 6px 2px;
-  border:1px dashed var(--leak);border-left:0}
-.leakrow{grid-column:2;font-size:.82rem;color:var(--muted);padding-left:2px}
-.leakrow.worst{color:var(--leak);font-weight:650}
-@media (prefers-reduced-motion:reduce){.bar{transition:none}}
+@media (max-width:640px){
+  .step-btn{grid-template-columns:14px 1fr 112px}
+  .step-btn .track{grid-column:2/4;grid-row:2}
+  .leakrow{grid-column:2/4}
+  .det{padding-left:14px}
+}
+@media (prefers-reduced-motion:reduce){.bar,.chev{transition:none}}
 /* tablas */
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.92rem}
 th,td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -138,9 +167,16 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
   <div class="ctrl" id="canales"></div>
 
   <section class="panel" id="embudo-p">
-    <h2>Embudo</h2>
-    <p class="sub">Agendas que entraron al pipeline en el período, según la etapa en la que están hoy. La franja rayada es lo que se perdió en cada paso. Tocá una etapa para ver los nombres.</p>
-    <div id="embudo"></div>
+    <div class="fun-head"><h2>Embudo de agendas</h2><span class="fun-tag">Por fecha de entrada</span></div>
+    <p class="sub">Agendas que entraron al pipeline en el período, según la etapa en la que están hoy. La franja rayada es lo que se quedó antes de cada paso. Tocá un paso para ver los nombres.</p>
+    <div class="steps" id="embudo"></div>
+  </section>
+
+  <section class="panel" id="llamadas-p">
+    <div class="fun-head"><h2>Llamadas</h2><span class="fun-tag">Por fecha de la cita</span></div>
+    <p class="sub">Citas de los closers en el calendario de GHL con fecha en el período y que ya pasaron, según la etapa en la que está la oportunidad hoy. Tocá un paso para ver los nombres.</p>
+    <div class="steps" id="embllamadas"></div>
+    <p class="callnote" id="callnote"></p>
   </section>
 
   <div class="grid" style="margin-top:14px">
@@ -171,37 +207,43 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
   const LOC = 'x7nYndpXUc1dmpunATsZ';
   const CRM = 'https://ghl.foundersbs.com';
   // Clasificación de cada etapa del pipeline Agendas (por id, así sobrevive a renombres).
-  // nivel: hasta dónde llegó la agenda; tipo: curso / caida_filtro / caida_setteo / avanza / venta
+  // nivel: hasta dónde llegó la agenda (1 en curso · 2 conversando o en confirmación · 3 llamada confirmada
+  // · 4 asistió · 5 calificada · 6 seña o venta); tipo: curso / caida_filtro / caida_setteo / caida_show / avanza / venta
   const ETAPA = {
     '73b006f8-0bd9-4139-a483-5dd528525f3f': { tipo: 'curso', nivel: 1 },        // Sin cita
     'ffce6347-55fd-4de4-9f1e-8be998f14612': { tipo: 'curso', nivel: 1 },        // Nuevo Lead
     'd2521380-080f-49fa-89f8-b2aa933e25eb': { tipo: 'curso', nivel: 1 },        // Lead confirmar nicho
     '478830fe-ae33-45bf-b2a7-c297a274840d': { tipo: 'curso', nivel: 1 },        // Triaje - Bio - Auto
     '40ca0460-22c2-401e-abdc-f25e3fdb7239': { tipo: 'curso', nivel: 1 },        // Contactar más adelante
-    'f6db291b-a166-4080-a7ef-6a8ef105112b': { tipo: 'curso', nivel: 1 },        // Conversando
-    '34f9495f-3012-467b-95ef-66d2be9c8b14': { tipo: 'curso', nivel: 1 },        // Formulario enviado
+    'f6db291b-a166-4080-a7ef-6a8ef105112b': { tipo: 'curso', nivel: 2 },        // Conversando
+    '34f9495f-3012-467b-95ef-66d2be9c8b14': { tipo: 'curso', nivel: 2 },        // Formulario enviado
+    'b340fd17-1239-48a2-a155-c44a713ca9d5': { tipo: 'curso', nivel: 2 },        // Nutrición - confirmación
     'd94bca6a-8f74-49cc-9d71-4b709b3baa8b': { tipo: 'caida_filtro', nivel: 0 }, // Nicho sin dinero
     '26a12464-b8c5-4479-b395-81bb0055ce4a': { tipo: 'caida_filtro', nivel: 0 }, // Desc. por inversión
     '9d0be400-6169-44db-b51d-0c48135bb8fb': { tipo: 'caida_filtro', nivel: 0 }, // Desc. por nicho
     'a974dea6-d07e-4f56-bb29-1c9d9b201b71': { tipo: 'caida_filtro', nivel: 0 }, // Interesados sin dinero
     '5600b3d7-8ca6-4ea0-a833-c59ef3359120': { tipo: 'caida_setteo', nivel: 1 }, // No responde
     '0e9f05f1-5cc8-45d7-9826-8fe7a7190d50': { tipo: 'caida_setteo', nivel: 1 }, // Cancelado - Setter
-    'a2293b95-6756-412c-a3a7-1443889be0fe': { tipo: 'avanza', nivel: 2 },       // Triaje confirmado
-    'b340fd17-1239-48a2-a155-c44a713ca9d5': { tipo: 'avanza', nivel: 2 },       // Nutrición - confirmación
-    'b7c0eff7-3cef-422e-8f2e-e31764efe11e': { tipo: 'caida_show', nivel: 2 },   // No asistió
-    '53407c49-b9de-4af9-a777-d5c05fac7005': { tipo: 'avanza', nivel: 3 },       // Asistencia sin dinero
-    'cb4fe580-9695-4ffb-b6f9-856b65b9f24b': { tipo: 'avanza', nivel: 3 },       // Asistencia no encaja
-    '6d7e9c82-450c-4613-9ef1-26d42e10bf97': { tipo: 'avanza', nivel: 4 },       // Asistencia cualificada
-    '9b814aaa-e9e0-4d95-b217-e61c1efd61cf': { tipo: 'venta', nivel: 5 },        // Seña
-    'd9f852a9-b4a8-40fc-b40b-c6cefc2060e0': { tipo: 'venta', nivel: 5 },        // Venta
+    'a2293b95-6756-412c-a3a7-1443889be0fe': { tipo: 'avanza', nivel: 3 },       // Triaje confirmado
+    'b7c0eff7-3cef-422e-8f2e-e31764efe11e': { tipo: 'caida_show', nivel: 3 },   // No asistió
+    '53407c49-b9de-4af9-a777-d5c05fac7005': { tipo: 'avanza', nivel: 4 },       // Asistencia sin dinero
+    'cb4fe580-9695-4ffb-b6f9-856b65b9f24b': { tipo: 'avanza', nivel: 4 },       // Asistencia no encaja
+    '6d7e9c82-450c-4613-9ef1-26d42e10bf97': { tipo: 'avanza', nivel: 5 },       // Asistencia cualificada
+    '9b814aaa-e9e0-4d95-b217-e61c1efd61cf': { tipo: 'venta', nivel: 6 },        // Seña
+    'd9f852a9-b4a8-40fc-b40b-c6cefc2060e0': { tipo: 'venta', nivel: 6 },        // Venta
   };
   const PASOS = [
     { k: 'agendas', nombre: 'Agendas', nota: 'Entraron al pipeline', ok: () => true },
     { k: 'filtro', nombre: 'Pasaron el filtro', nota: 'No descualificadas', ok: (o) => o.info.tipo !== 'caida_filtro' },
-    { k: 'confirmadas', nombre: 'Llamada confirmada', nota: 'Confirmaron o pasaron de ahí', ok: (o) => o.info.nivel >= 2 && o.info.tipo !== 'caida_setteo' },
-    { k: 'asistieron', nombre: 'Asistieron', nota: 'Se presentaron a la llamada', ok: (o) => o.info.nivel >= 3 },
-    { k: 'calificadas', nombre: 'Asistencia calificada', nota: 'Calificadas por el closer', ok: (o) => o.info.nivel >= 4 },
-    { k: 'ventas', nombre: 'Seña o venta', nota: 'Cerradas', ok: (o) => o.info.nivel >= 5 },
+    { k: 'conversando', nombre: 'Conversando o en confirmación', nota: 'El setter ya habló con la persona', ok: (o) => o.info.nivel >= 2 && o.info.tipo !== 'caida_setteo' },
+    { k: 'confirmadas', nombre: 'Llamada confirmada', nota: 'Confirmaron o pasaron de ahí', ok: (o) => o.info.nivel >= 3 },
+  ];
+  // Llamadas: citas del período que ya pasaron, según la etapa actual de su oportunidad.
+  const LLAMADAS = [
+    { k: 'll', nombre: 'Llamadas', nota: 'Citas que ya pasaron', ok: () => true },
+    { k: 'asistieron', nombre: 'Asistieron', nota: 'Se presentaron a la llamada', ok: (o) => o.info.nivel >= 4 },
+    { k: 'calificadas', nombre: 'Asistencia calificada', nota: 'Calificadas por el closer', ok: (o) => o.info.nivel >= 5 },
+    { k: 'ventas', nombre: 'Seña o venta', nota: 'Cerradas', ok: (o) => o.info.nivel >= 6 },
   ];
 
   const $ = (id) => document.getElementById(id);
@@ -211,8 +253,9 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
   const ymd = (d) => d.toISOString().slice(0, 10);
   const hoyAR = () => new Date(Date.now() - 3 * 3600e3);
   const fdia = (iso) => new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', timeZone: 'America/Argentina/Buenos_Aires' });
+  const fhora = (iso) => new Date(iso).toLocaleString('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' });
 
-  const state = { preset: '7d', desde: '', hasta: '', canal: 'Todos', paso: null, q: '', data: null, cargando: false };
+  const state = { preset: '7d', desde: '', hasta: '', canal: 'Todos', paso: null, abiertos: new Set(), q: '', data: null, cargando: false };
   let key = '';
   try { key = localStorage.getItem('dashKey') || ''; } catch (e) {}
 
@@ -233,7 +276,9 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
       if (r.status === 401) { pedirClave('Clave incorrecta.'); return; }
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || 'Error');
-      d.ops.forEach((o) => { o.info = ETAPA[o.etapa] || { tipo: 'curso', nivel: 1 }; if ((o.estado === 'lost' || o.estado === 'abandoned') && o.info.nivel < 2) o.info = { tipo: 'caida_setteo', nivel: 1 }; });
+      d.ops.forEach((o) => { o.info = ETAPA[o.etapa] || { tipo: 'curso', nivel: 1 }; if ((o.estado === 'lost' || o.estado === 'abandoned') && o.info.nivel < 3) o.info = { tipo: 'caida_setteo', nivel: 1 }; });
+      d.llamadas = d.llamadas || [];
+      d.llamadas.forEach((l) => { l.info = (l.etapa && ETAPA[l.etapa]) || { tipo: 'curso', nivel: l.etapa ? 1 : 0 }; });
       d.nombreEtapa = Object.fromEntries(d.etapas.map((s) => [s.id, s.nombre]));
       state.data = d; state.error = null;
     } catch (e) { state.error = 'No se pudo leer GHL: ' + e.message; }
@@ -290,6 +335,7 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
     const canalTxt = state.canal === 'Todos' ? '' : ` de ${state.canal}`;
     const take = $('take'); take.replaceChildren();
     if (!ops.length) take.textContent = `No entraron agendas${canalTxt} en este período.`;
+    else if (peor < 1) take.textContent = `Entraron ${cuentas[0]} agendas${canalTxt} y todas llegaron a la llamada confirmada.`;
     else {
       take.append(`Entraron ${cuentas[0]} agendas${canalTxt}. La mayor caída está entre ${PASOS[peor - 1].nombre.toLowerCase()} y ${PASOS[peor].nombre.toLowerCase()}: `);
       take.append(el('b', '', `se perdieron ${peorN}`));
@@ -297,44 +343,44 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
       take.append(curso ? `, y ${curso} todavía están en conversación.` : '.');
     }
 
-    // embudo
-    const emb = $('embudo'); emb.replaceChildren();
-    const max = cuentas[0] || 1;
-    PASOS.forEach((p, i) => {
-      const row = el('div', 'step' + (state.paso === p.k ? ' sel' : ''));
-      row.tabIndex = 0; row.setAttribute('role', 'button');
-      const lab = el('div', 'lab'); lab.append(el('b', '', p.nombre), el('span', '', i ? `${fmtPct(pct(cuentas[i], cuentas[i - 1]))} del paso anterior` : p.nota));
-      const tr = el('div', 'track');
-      const w = (cuentas[i] / max) * 100;
-      const bar = el('div', 'bar'); bar.style.width = w + '%';
-      const numTxt = cuentas[i].toLocaleString('es-AR');
-      if (w >= 14) bar.append(el('span', '', numTxt));
-      tr.append(bar);
-      if (i) { const lk = el('div', 'leak'); lk.style.width = ((cuentas[i - 1] - cuentas[i]) / max) * 100 + '%'; tr.append(lk); }
-      if (w < 14) tr.append(el('span', 'out', numTxt));
-      row.append(lab, tr);
-      const sel = () => { state.paso = state.paso === p.k ? null : p.k; pintar(); };
-      row.addEventListener('click', sel); row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sel(); } });
-      if (i) {
-        const perd = cuentas[i - 1] - cuentas[i];
-        row.append(el('div', 'leakrow' + (i === peor ? ' worst' : ''), perd ? `− ${perd} se quedaron antes de este paso` : 'Sin pérdidas en este paso'));
-      }
-      emb.append(row);
-    });
+    // embudos desplegables
+    pintarEmbudo($('embudo'), PASOS, ops, 'ag', peor, (o) => `${o.canal} · entró ${fdia(o.creado)}`);
+    const ahora = Date.now();
+    const llam = (state.canal === 'Todos' ? d.llamadas : d.llamadas.filter((l) => l.canal === state.canal));
+    const pasadas = llam.filter((l) => new Date(l.inicio).getTime() <= ahora);
+    const peorL = (() => { const c = LLAMADAS.map((p) => pasadas.filter(p.ok).length); let w = -1, n = 0; for (let i = 1; i < c.length; i++) if (c[i - 1] - c[i] > n) { n = c[i - 1] - c[i]; w = i; } return w; })();
+    pintarEmbudo($('embllamadas'), LLAMADAS, pasadas, 'll', peorL, (l) => `${fhora(l.inicio)} · ${l.closer}${l.canal ? ' · ' + l.canal : ''}`);
+    const nota = $('callnote'); nota.replaceChildren();
+    if (d.llamadasError) nota.append(el('span', 'err', 'No se pudo leer el calendario de GHL: ' + d.llamadasError));
+    else {
+      const sinCargar = pasadas.filter((l) => l.info.nivel > 0 && l.info.nivel < 4 && l.info.tipo !== 'caida_show').length;
+      const noAsist = pasadas.filter((l) => l.info.tipo === 'caida_show').length;
+      const sinOp = pasadas.filter((l) => !l.etapa).length;
+      const prox = llam.length - pasadas.length;
+      const partes = [];
+      if (noAsist) partes.push(`${noAsist} no asistieron`);
+      if (sinCargar) partes.push(`<b>${sinCargar} sin asistencia cargada en GHL</b>`);
+      if (sinOp) partes.push(`<b>${sinOp} sin oportunidad en Agendas</b>`);
+      if (prox) partes.push(`${prox} ${prox === 1 ? 'cita más agendada' : 'citas más agendadas'} para más adelante en el período`);
+      nota.innerHTML = partes.length ? partes.join(' · ') + '.' : (pasadas.length ? '' : 'No hubo llamadas en este período.');
+    }
 
     // tabla por canal
     const t = $('tcanal'); t.replaceChildren();
-    const hr = el('tr'); ['Canal', 'Agendas', 'Pasan filtro', 'Confirmadas', 'Asistieron', 'Ventas', 'Agenda → confirmada'].forEach((h) => hr.append(el('th', '', h)));
+    const hr = el('tr'); ['Canal', 'Agendas', 'Pasan filtro', 'Conversando', 'Confirmadas', 'Agenda → confirmada', 'Llamadas', 'Asistieron', 'Ventas'].forEach((h) => hr.append(el('th', '', h)));
     t.append(hr);
     const filas = canales.filter((c) => c !== 'Todos').concat(['Todos']);
-    const tasas = filas.map((c) => { const o = c === 'Todos' ? d.ops : d.ops.filter((x) => x.canal === c); return pct(o.filter(PASOS[2].ok).length, o.length); });
+    const tasas = filas.map((c) => { const o = c === 'Todos' ? d.ops : d.ops.filter((x) => x.canal === c); return pct(o.filter(PASOS[3].ok).length, o.length); });
+    const pasadasTodas = d.llamadas.filter((l) => new Date(l.inicio).getTime() <= Date.now());
     const media = tasas[tasas.length - 1];
     filas.forEach((c, idx) => {
       const o = c === 'Todos' ? d.ops : d.ops.filter((x) => x.canal === c);
       const r = el('tr', 'click' + (state.canal === c ? ' on' : ''));
       r.append(el('td', '', c === 'Todos' ? 'Total' : c));
-      [0, 1, 2, 3, 5].forEach((k) => r.append(el('td', '', o.filter(PASOS[k].ok).length.toLocaleString('es-AR'))));
+      [0, 1, 2, 3].forEach((k) => r.append(el('td', '', o.filter(PASOS[k].ok).length.toLocaleString('es-AR'))));
       const tc = el('td', tasas[idx] < media && c !== 'Todos' ? 'low' : '', fmtPct(tasas[idx])); r.append(tc);
+      const l = c === 'Todos' ? pasadasTodas : pasadasTodas.filter((x) => x.canal === c);
+      [0, 1, 3].forEach((k) => r.append(el('td', '', l.filter(LLAMADAS[k].ok).length.toLocaleString('es-AR'))));
       if (c === 'Todos') r.style.fontWeight = '700';
       r.addEventListener('click', () => { state.canal = c; state.paso = null; pintar(); });
       t.append(r);
@@ -361,6 +407,51 @@ details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin
     if (!wh.children.length) wh.append(el('p', 'sub', 'Todas las agendas del período llegaron a la llamada.'));
 
     pintarLista();
+  }
+
+  function pintarEmbudo(cont, pasos, items, pref, peor, meta) {
+    cont.replaceChildren();
+    const d = state.data;
+    const cuentas = pasos.map((p) => items.filter(p.ok).length);
+    const max = cuentas[0] || 1;
+    pasos.forEach((p, i) => {
+      const key = pref + ':' + p.k;
+      const abierto = state.abiertos.has(key);
+      const step = el('div', 'step' + (abierto ? ' open' : ''));
+      const btn = el('button', 'step-btn'); btn.type = 'button'; btn.setAttribute('aria-expanded', String(abierto));
+      const lab = el('div', 'lab'); lab.append(el('b', '', p.nombre), el('span', '', p.nota));
+      const tr = el('div', 'track');
+      const bar = el('div', 'bar'); bar.style.width = (cuentas[i] / max) * 100 + '%'; tr.append(bar);
+      if (i) { const lk = el('div', 'leak'); lk.style.width = ((cuentas[i - 1] - cuentas[i]) / max) * 100 + '%'; tr.append(lk); }
+      const val = el('div', 'val'); val.append(el('b', '', cuentas[i].toLocaleString('es-AR')), el('span', '', i ? `${fmtPct(pct(cuentas[i], cuentas[i - 1]))} del anterior` : 'total'));
+      btn.append(el('span', 'chev'), lab, tr, val);
+      if (i) {
+        const perd = cuentas[i - 1] - cuentas[i];
+        btn.append(el('div', 'leakrow' + (i === peor ? ' worst' : ''), perd ? `− ${perd} se quedaron antes de este paso` : 'Sin pérdidas en este paso'));
+      }
+      btn.addEventListener('click', () => { abierto ? state.abiertos.delete(key) : state.abiertos.add(key); pintar(); });
+      step.append(btn);
+      if (abierto) {
+        const det = el('div', 'det');
+        const lista = (titulo, cls, arr) => {
+          const box = el('div'); box.append(el('h3', cls, `${titulo} · ${arr.length}`));
+          const ul = el('ul', 'nlist');
+          if (!arr.length) { const li = el('li'); li.append(el('span', 'vacio', 'Nadie')); ul.append(li); }
+          arr.slice().sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')).forEach((o) => {
+            const li = el('li');
+            const a = el('a', '', o.nombre); a.href = `${CRM}/v2/location/${LOC}/contacts/detail/${o.contactId}`; a.target = '_blank'; a.rel = 'noopener';
+            const chip = o.etapa ? el('span', 'chip ' + clase(o.info), d.nombreEtapa[o.etapa] || 'Etapa') : el('span', 'chip c-caida', 'Sin oportunidad');
+            li.append(a, chip, el('small', '', meta(o)));
+            ul.append(li);
+          });
+          box.append(ul); return box;
+        };
+        det.append(lista(i ? 'Llegaron' : 'Todas', '', items.filter(p.ok)));
+        if (i) det.append(lista('Se quedaron antes', 'perd', items.filter((o) => pasos[i - 1].ok(o) && !p.ok(o))));
+        step.append(det);
+      }
+      cont.append(step);
+    });
   }
 
   function pintarLista() {
