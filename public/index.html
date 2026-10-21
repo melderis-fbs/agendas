@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agendas · Founders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --bg:#EEF1F4; --panel:#FFFFFF; --ink:#16202A; --muted:#5B6773; --line:#D5DBE1;
+  --flow:#1F5C73; --flow-soft:#BCD3DC; --leak:#B42318; --leak-soft:#F6D5D1; --ok:#1E7A4C; --wait:#8A6A10;
+  --r:10px; --f:"Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#10161C; --panel:#18212A; --ink:#E7ECF0; --muted:#97A3AE; --line:#2A3743;
+    --flow:#6FB3CB; --flow-soft:#24414D; --leak:#F0897C; --leak-soft:#4A2220; --ok:#6CCB97; --wait:#E1C163; }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.45;
+  padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.wrap{max-width:1080px;margin-inline:auto;padding:20px 16px 48px}
+h1{font-stretch:75%;font-weight:800;font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.05;margin:0}
+h2{font-size:1.05rem;font-weight:700;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:end;margin-bottom:6px}
+.stamp{color:var(--muted);font-size:.85rem}
+.take{font-size:clamp(1.05rem,2.4vw,1.3rem);margin:10px 0 18px;max-width:62ch}
+.take b{color:var(--leak);font-weight:700}
+.ctrl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.ctrl button,.ctrl input{font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  border-radius:999px;padding:6px 12px;cursor:pointer}
+.ctrl input{border-radius:8px;padding:5px 8px}
+.ctrl button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ctrl .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--flow);outline-offset:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:14px}
+.grid .panel{margin-top:0}
+/* embudo con fugas */
+.step{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:4px 14px;align-items:center;padding:6px 0;cursor:pointer;border-radius:8px}
+.step:hover .bar{filter:brightness(1.08)}
+.step.sel .lab b{text-decoration:underline;text-underline-offset:3px}
+.lab b{display:block;font-weight:650}
+.lab span{color:var(--muted);font-size:.82rem}
+.track{position:relative;height:34px;display:flex;align-items:center}
+.bar{height:100%;background:var(--flow);border-radius:6px 2px 2px 6px;min-width:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
+  color:#fff;font-weight:800;font-stretch:110%;font-variant-numeric:tabular-nums;font-size:1.05rem;transition:width .4s ease}
+.out{margin-left:8px;font-weight:800;font-stretch:110%;font-variant-numeric:tabular-nums;font-size:1.05rem}
+.wrow.on{background:color-mix(in srgb,var(--flow-soft) 60%,transparent)}
+.leak{height:100%;background:repeating-linear-gradient(-45deg,var(--leak-soft) 0 6px,transparent 6px 11px);border-radius:2px 6px 6px 2px;
+  border:1px dashed var(--leak);border-left:0}
+.leakrow{grid-column:2;font-size:.82rem;color:var(--muted);padding-left:2px}
+.leakrow.worst{color:var(--leak);font-weight:650}
+@media (prefers-reduced-motion:reduce){.bar{transition:none}}
+/* tablas */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:.92rem}
+th,td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600;font-size:.82rem}
+tr.click{cursor:pointer} tr.click:hover td{background:color-mix(in srgb,var(--flow-soft) 35%,transparent)}
+tr.on td{background:color-mix(in srgb,var(--flow-soft) 60%,transparent)}
+.scroll{overflow-x:auto}
+.low{color:var(--leak);font-weight:650}
+/* dónde quedaron */
+.where{display:flex;flex-direction:column;gap:6px}
+.wrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:.92rem;cursor:pointer;padding:3px 4px;border-radius:6px}
+.wrow:hover{background:color-mix(in srgb,var(--flow-soft) 35%,transparent)}
+.wbar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.wbar i{display:block;height:100%}
+.grp{font-size:.8rem;color:var(--muted);margin:10px 0 2px;font-weight:600}
+/* personas */
+.list-head{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center;margin-bottom:8px}
+.list-head input{font:inherit;font-size:.9rem;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--bg);color:var(--ink);min-width:200px}
+.chip{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.c-avanza{background:color-mix(in srgb,var(--flow) 18%,transparent);color:var(--flow)}
+.c-curso{background:color-mix(in srgb,var(--wait) 18%,transparent);color:var(--wait)}
+.c-caida{background:color-mix(in srgb,var(--leak) 16%,transparent);color:var(--leak)}
+.c-venta{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.people{max-height:520px;overflow:auto}
+.people th{position:sticky;top:0;background:var(--panel)}
+.people a{color:inherit;text-decoration:none;font-weight:600}
+.people a:hover{text-decoration:underline}
+.filtro-activo{font-size:.85rem}
+.filtro-activo button{font:inherit;border:0;background:none;color:var(--flow);cursor:pointer;text-decoration:underline}
+.msg{padding:40px 0;color:var(--muted);text-align:center}
+.err{color:var(--leak)}
+.gate{max-width:360px;margin:15vh auto;padding:24px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.gate input{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;margin:10px 0;background:var(--bg);color:var(--ink)}
+.gate button{font:inherit;font-weight:700;width:100%;padding:10px;border:0;border-radius:8px;background:var(--ink);color:var(--bg);cursor:pointer}
+.al-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.al-head button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.al-quien{font-weight:700;margin:12px 0 4px;font-size:.95rem}
+.al{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:.9rem}
+.al .r{font-weight:800;font-stretch:110%;color:var(--leak);min-width:1.4em}
+.al .r.i{color:var(--wait)}
+.al a{color:inherit;font-weight:650}
+.al .rev{grid-column:2;color:var(--muted);font-size:.84rem}
+.al .rev.dud{color:var(--wait)}
+.al-fuentes{color:var(--muted);font-size:.8rem;margin-top:10px}
+.al-vacio{color:var(--ok);font-weight:600;margin:6px 0 0}
+details.al-mas summary{cursor:pointer;color:var(--muted);font-size:.85rem;margin-top:8px}
+.note{color:var(--muted);font-size:.82rem;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="gate" class="gate" hidden>
+  <h2>Tablero de agendas</h2>
+  <p class="sub">Ingresá la clave del equipo. Se guarda en este dispositivo.</p>
+  <input id="key" type="password" autocomplete="current-password" aria-label="Clave">
+  <button id="enter">Entrar</button>
+  <p id="gateErr" class="err"></p>
+</div>
+
+<main class="wrap" id="app" hidden>
+  <div class="top">
+    <h1>Dónde se caen las agendas</h1>
+    <span class="stamp" id="stamp"></span>
+  </div>
+  <p class="take" id="take">Cargando el pipeline Agendas…</p>
+
+
+  <section class="panel" id="alertas-p">
+    <div class="al-head"><h2 id="al-tit">Para corregir en GHL</h2><span><span class="stamp" id="al-stamp"></span> <button id="al-correr">Revisar ahora</button></span></div>
+    <p class="sub">Cruce automático de GHL con el calendario de los closers, #reporte-diario-comercial y #altas-pagos-clientes, cada 30 minutos. Cuando se corrige en GHL, la alerta desaparece en el siguiente chequeo.</p>
+    <div id="alertas"></div>
+  </section>
+
+  <div class="ctrl" id="periodos">
+    <button data-p="hoy">Hoy</button><button data-p="ayer">Ayer</button>
+    <button data-p="7d">7 días</button><button data-p="mes">Este mes</button><button data-p="30d">30 días</button>
+    <span class="sep"></span>
+    <input type="date" id="d1" aria-label="Desde"><input type="date" id="d2" aria-label="Hasta">
+  </div>
+  <div class="ctrl" id="canales"></div>
+
+  <section class="panel" id="embudo-p">
+    <h2>Embudo</h2>
+    <p class="sub">Agendas que entraron al pipeline en el período, según la etapa en la que están hoy. La franja rayada es lo que se perdió en cada paso. Tocá una etapa para ver los nombres.</p>
+    <div id="embudo"></div>
+  </section>
+
+  <div class="grid" style="margin-top:14px">
+    <section class="panel">
+      <h2>Por canal</h2>
+      <p class="sub">Tocá un canal para filtrar todo el tablero.</p>
+      <div class="scroll"><table id="tcanal"></table></div>
+    </section>
+    <section class="panel">
+      <h2>Dónde quedaron las que no avanzaron</h2>
+      <p class="sub">Etapa actual de las agendas que no llegaron a la llamada.</p>
+      <div class="where" id="where"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="list-head">
+      <div><h2>Agendas</h2><span class="filtro-activo" id="factivo"></span></div>
+      <input type="search" id="q" placeholder="Buscar por nombre" aria-label="Buscar por nombre">
+    </div>
+    <div class="people scroll"><table id="tpeople"></table></div>
+    <p class="note">Se actualiza solo cada 5 minutos. Fuente: GoHighLevel, pipeline Agendas.</p>
+  </section>
+</main>
+
+<script>
+(() => {
+  const LOC = 'x7nYndpXUc1dmpunATsZ';
+  const CRM = 'https://ghl.foundersbs.com';
+  // Clasificación de cada etapa del pipeline Agendas (por id, así sobrevive a renombres).
+  // nivel: hasta dónde llegó la agenda; tipo: curso / caida_filtro / caida_setteo / avanza / venta
+  const ETAPA = {
+    '73b006f8-0bd9-4139-a483-5dd528525f3f': { tipo: 'curso', nivel: 1 },        // Sin cita
+    'ffce6347-55fd-4de4-9f1e-8be998f14612': { tipo: 'curso', nivel: 1 },        // Nuevo Lead
+    'd2521380-080f-49fa-89f8-b2aa933e25eb': { tipo: 'curso', nivel: 1 },        // Lead confirmar nicho
+    '478830fe-ae33-45bf-b2a7-c297a274840d': { tipo: 'curso', nivel: 1 },        // Triaje - Bio - Auto
+    '40ca0460-22c2-401e-abdc-f25e3fdb7239': { tipo: 'curso', nivel: 1 },        // Contactar más adelante
+    'f6db291b-a166-4080-a7ef-6a8ef105112b': { tipo: 'curso', nivel: 1 },        // Conversando
+    '34f9495f-3012-467b-95ef-66d2be9c8b14': { tipo: 'curso', nivel: 1 },        // Formulario enviado
+    'd94bca6a-8f74-49cc-9d71-4b709b3baa8b': { tipo: 'caida_filtro', nivel: 0 }, // Nicho sin dinero
+    '26a12464-b8c5-4479-b395-81bb0055ce4a': { tipo: 'caida_filtro', nivel: 0 }, // Desc. por inversión
+    '9d0be400-6169-44db-b51d-0c48135bb8fb': { tipo: 'caida_filtro', nivel: 0 }, // Desc. por nicho
+    'a974dea6-d07e-4f56-bb29-1c9d9b201b71': { tipo: 'caida_filtro', nivel: 0 }, // Interesados sin dinero
+    '5600b3d7-8ca6-4ea0-a833-c59ef3359120': { tipo: 'caida_setteo', nivel: 1 }, // No responde
+    '0e9f05f1-5cc8-45d7-9826-8fe7a7190d50': { tipo: 'caida_setteo', nivel: 1 }, // Cancelado - Setter
+    'a2293b95-6756-412c-a3a7-1443889be0fe': { tipo: 'avanza', nivel: 2 },       // Triaje confirmado
+    'b340fd17-1239-48a2-a155-c44a713ca9d5': { tipo: 'avanza', nivel: 2 },       // Nutrición - confirmación
+    'b7c0eff7-3cef-422e-8f2e-e31764efe11e': { tipo: 'caida_show', nivel: 2 },   // No asistió
+    '53407c49-b9de-4af9-a777-d5c05fac7005': { tipo: 'avanza', nivel: 3 },       // Asistencia sin dinero
+    'cb4fe580-9695-4ffb-b6f9-856b65b9f24b': { tipo: 'avanza', nivel: 3 },       // Asistencia no encaja
+    '6d7e9c82-450c-4613-9ef1-26d42e10bf97': { tipo: 'avanza', nivel: 4 },       // Asistencia cualificada
+    '9b814aaa-e9e0-4d95-b217-e61c1efd61cf': { tipo: 'venta', nivel: 5 },        // Seña
+    'd9f852a9-b4a8-40fc-b40b-c6cefc2060e0': { tipo: 'venta', nivel: 5 },        // Venta
+  };
+  const PASOS = [
+    { k: 'agendas', nombre: 'Agendas', nota: 'Entraron al pipeline', ok: () => true },
+    { k: 'filtro', nombre: 'Pasaron el filtro', nota: 'No descualificadas', ok: (o) => o.info.tipo !== 'caida_filtro' },
+    { k: 'confirmadas', nombre: 'Llamada confirmada', nota: 'Confirmaron o pasaron de ahí', ok: (o) => o.info.nivel >= 2 && o.info.tipo !== 'caida_setteo' },
+    { k: 'asistieron', nombre: 'Asistieron', nota: 'Se presentaron a la llamada', ok: (o) => o.info.nivel >= 3 },
+    { k: 'calificadas', nombre: 'Asistencia calificada', nota: 'Calificadas por el closer', ok: (o) => o.info.nivel >= 4 },
+    { k: 'ventas', nombre: 'Seña o venta', nota: 'Cerradas', ok: (o) => o.info.nivel >= 5 },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt !== undefined) e.textContent = txt; return e; };
+  const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : 0);
+  const fmtPct = (v) => v.toLocaleString('es-AR', { maximumFractionDigits: 1 }) + '%';
+  const ymd = (d) => d.toISOString().slice(0, 10);
+  const hoyAR = () => new Date(Date.now() - 3 * 3600e3);
+  const fdia = (iso) => new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', timeZone: 'America/Argentina/Buenos_Aires' });
+
+  const state = { preset: '7d', desde: '', hasta: '', canal: 'Todos', paso: null, q: '', data: null, cargando: false };
+  let key = '';
+  try { key = localStorage.getItem('dashKey') || ''; } catch (e) {}
+
+  const rango = (p) => {
+    const h = hoyAR(); const s = new Date(h);
+    if (p === 'ayer') { s.setUTCDate(h.getUTCDate() - 1); return [s, s]; }
+    if (p === '7d') s.setUTCDate(h.getUTCDate() - 6);
+    if (p === '30d') s.setUTCDate(h.getUTCDate() - 29);
+    if (p === 'mes') s.setUTCDate(1);
+    return [s, h];
+  };
+  const setPreset = (p) => { const [a, b] = rango(p); state.preset = p; state.desde = ymd(a); state.hasta = ymd(b); cargar(); };
+
+  async function cargar() {
+    state.cargando = true; pintar();
+    try {
+      const r = await fetch(`/api/agendas?desde=${state.desde}&hasta=${state.hasta}`, { headers: { 'x-dash-key': key } });
+      if (r.status === 401) { pedirClave('Clave incorrecta.'); return; }
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Error');
+      d.ops.forEach((o) => { o.info = ETAPA[o.etapa] || { tipo: 'curso', nivel: 1 }; if ((o.estado === 'lost' || o.estado === 'abandoned') && o.info.nivel < 2) o.info = { tipo: 'caida_setteo', nivel: 1 }; });
+      d.nombreEtapa = Object.fromEntries(d.etapas.map((s) => [s.id, s.nombre]));
+      state.data = d; state.error = null;
+    } catch (e) { state.error = 'No se pudo leer GHL: ' + e.message; }
+    state.cargando = false; pintar();
+  }
+
+  function pedirClave(msg) {
+    $('app').hidden = true; $('gate').hidden = false; $('gateErr').textContent = msg || ''; $('key').focus();
+  }
+  $('enter').addEventListener('click', () => {
+    key = $('key').value.trim(); try { localStorage.setItem('dashKey', key); } catch (e) {}
+    $('gate').hidden = true; $('app').hidden = false; cargar(); cargarAlertas();
+  });
+  $('key').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('enter').click(); });
+
+  document.querySelectorAll('#periodos button').forEach((b) => b.addEventListener('click', () => setPreset(b.dataset.p)));
+  const fechas = () => { const a = $('d1').value, b = $('d2').value; if (a && b && a <= b && a > '2025') { state.preset = 'custom'; state.desde = a; state.hasta = b; cargar(); } };
+  $('d1').addEventListener('change', fechas); $('d2').addEventListener('change', fechas);
+  $('q').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase(); pintarLista(); });
+
+  const filtradas = () => {
+    const ops = state.data ? state.data.ops : [];
+    return state.canal === 'Todos' ? ops : ops.filter((o) => o.canal === state.canal);
+  };
+  const clase = (info) => info.tipo === 'venta' ? 'c-venta' : info.tipo.startsWith('caida') ? 'c-caida' : info.tipo === 'curso' ? 'c-curso' : 'c-avanza';
+
+  function pintar() {
+    document.querySelectorAll('#periodos button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === state.preset)));
+    $('d1').value = state.desde; $('d2').value = state.hasta;
+    const d = state.data;
+    $('stamp').textContent = state.cargando ? 'Actualizando…' : d ? 'Actualizado ' + new Date(d.actualizado).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
+    if (state.error) { $('take').textContent = state.error; return; }
+    if (!d) return;
+
+    // canales
+    const canales = ['Todos', ...Array.from(new Set(d.ops.map((o) => o.canal))).sort((a, b) => d.ops.filter((o) => o.canal === b).length - d.ops.filter((o) => o.canal === a).length)];
+    if (!canales.includes(state.canal)) state.canal = 'Todos';
+    const cc = $('canales'); cc.replaceChildren();
+    canales.forEach((c) => {
+      const b = el('button', '', c === 'Todos' ? 'Todos los canales' : c);
+      b.setAttribute('aria-pressed', String(c === state.canal));
+      b.addEventListener('click', () => { state.canal = c; state.paso = null; pintar(); });
+      cc.append(b);
+    });
+
+    const ops = filtradas();
+    const cuentas = PASOS.map((p) => ops.filter(p.ok).length);
+
+    // peor fuga (en personas) entre pasos
+    let peor = -1, peorN = 0;
+    for (let i = 1; i < PASOS.length; i++) { const perdidas = cuentas[i - 1] - cuentas[i]; if (perdidas > peorN) { peorN = perdidas; peor = i; } }
+
+    // titular
+    const canalTxt = state.canal === 'Todos' ? '' : ` de ${state.canal}`;
+    const take = $('take'); take.replaceChildren();
+    if (!ops.length) take.textContent = `No entraron agendas${canalTxt} en este período.`;
+    else {
+      take.append(`Entraron ${cuentas[0]} agendas${canalTxt}. La mayor caída está entre ${PASOS[peor - 1].nombre.toLowerCase()} y ${PASOS[peor].nombre.toLowerCase()}: `);
+      take.append(el('b', '', `se perdieron ${peorN}`));
+      const curso = ops.filter((o) => o.info.tipo === 'curso').length;
+      take.append(curso ? `, y ${curso} todavía están en conversación.` : '.');
+    }
+
+    // embudo
+    const emb = $('embudo'); emb.replaceChildren();
+    const max = cuentas[0] || 1;
+    PASOS.forEach((p, i) => {
+      const row = el('div', 'step' + (state.paso === p.k ? ' sel' : ''));
+      row.tabIndex = 0; row.setAttribute('role', 'button');
+      const lab = el('div', 'lab'); lab.append(el('b', '', p.nombre), el('span', '', i ? `${fmtPct(pct(cuentas[i], cuentas[i - 1]))} del paso anterior` : p.nota));
+      const tr = el('div', 'track');
+      const w = (cuentas[i] / max) * 100;
+      const bar = el('div', 'bar'); bar.style.width = w + '%';
+      const numTxt = cuentas[i].toLocaleString('es-AR');
+      if (w >= 14) bar.append(el('span', '', numTxt));
+      tr.append(bar);
+      if (i) { const lk = el('div', 'leak'); lk.style.width = ((cuentas[i - 1] - cuentas[i]) / max) * 100 + '%'; tr.append(lk); }
+      if (w < 14) tr.append(el('span', 'out', numTxt));
+      row.append(lab, tr);
+      const sel = () => { state.paso = state.paso === p.k ? null : p.k; pintar(); };
+      row.addEventListener('click', sel); row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sel(); } });
+      if (i) {
+        const perd = cuentas[i - 1] - cuentas[i];
+        row.append(el('div', 'leakrow' + (i === peor ? ' worst' : ''), perd ? `− ${perd} se quedaron antes de este paso` : 'Sin pérdidas en este paso'));
+      }
+      emb.append(row);
+    });
+
+    // tabla por canal
+    const t = $('tcanal'); t.replaceChildren();
+    const hr = el('tr'); ['Canal', 'Agendas', 'Pasan filtro', 'Confirmadas', 'Asistieron', 'Ventas', 'Agenda → confirmada'].forEach((h) => hr.append(el('th', '', h)));
+    t.append(hr);
+    const filas = canales.filter((c) => c !== 'Todos').concat(['Todos']);
+    const tasas = filas.map((c) => { const o = c === 'Todos' ? d.ops : d.ops.filter((x) => x.canal === c); return pct(o.filter(PASOS[2].ok).length, o.length); });
+    const media = tasas[tasas.length - 1];
+    filas.forEach((c, idx) => {
+      const o = c === 'Todos' ? d.ops : d.ops.filter((x) => x.canal === c);
+      const r = el('tr', 'click' + (state.canal === c ? ' on' : ''));
+      r.append(el('td', '', c === 'Todos' ? 'Total' : c));
+      [0, 1, 2, 3, 5].forEach((k) => r.append(el('td', '', o.filter(PASOS[k].ok).length.toLocaleString('es-AR'))));
+      const tc = el('td', tasas[idx] < media && c !== 'Todos' ? 'low' : '', fmtPct(tasas[idx])); r.append(tc);
+      if (c === 'Todos') r.style.fontWeight = '700';
+      r.addEventListener('click', () => { state.canal = c; state.paso = null; pintar(); });
+      t.append(r);
+    });
+
+    // dónde quedaron
+    const wh = $('where'); wh.replaceChildren();
+    const grupos = [['curso', 'Todavía en conversación', 'var(--wait)'], ['caida_setteo', 'Se cayeron en el setteo', 'var(--leak)'], ['caida_filtro', 'Descualificadas', 'var(--muted)'], ['caida_show', 'Confirmaron y no asistieron', 'var(--leak)']];
+    const base = ops.length || 1;
+    grupos.forEach(([tipo, titulo, color]) => {
+      const porEtapa = {};
+      ops.filter((o) => o.info.tipo === tipo).forEach((o) => { porEtapa[o.etapa] = (porEtapa[o.etapa] || 0) + 1; });
+      const lista = Object.entries(porEtapa).sort((a, b) => b[1] - a[1]);
+      if (!lista.length) return;
+      wh.append(el('div', 'grp', `${titulo} · ${lista.reduce((s, x) => s + x[1], 0)}`));
+      lista.forEach(([id, n]) => {
+        const r = el('div', 'wrow' + (state.paso === 'etapa:' + id ? ' on' : ''));
+        r.append(el('span', '', d.nombreEtapa[id] || 'Etapa'), el('b', '', String(n)));
+        const b = el('div', 'wbar'); const i = el('i'); i.style.width = (n / base) * 100 + '%'; i.style.background = color; b.append(i); r.append(b);
+        r.addEventListener('click', () => { state.paso = state.paso === 'etapa:' + id ? null : 'etapa:' + id; pintar(); });
+        wh.append(r);
+      });
+    });
+    if (!wh.children.length) wh.append(el('p', 'sub', 'Todas las agendas del período llegaron a la llamada.'));
+
+    pintarLista();
+  }
+
+  function pintarLista() {
+    const d = state.data; if (!d) return;
+    let ops = filtradas();
+    let etiqueta = '';
+    if (state.paso && state.paso.startsWith('etapa:')) { const id = state.paso.slice(6); ops = ops.filter((o) => o.etapa === id); etiqueta = d.nombreEtapa[id]; }
+    else if (state.paso) { const p = PASOS.find((x) => x.k === state.paso); ops = ops.filter(p.ok); etiqueta = p.nombre; }
+    if (state.q) ops = ops.filter((o) => o.nombre.toLowerCase().includes(state.q));
+    const fa = $('factivo'); fa.replaceChildren();
+    fa.append(`${ops.length} ${ops.length === 1 ? 'persona' : 'personas'}${etiqueta ? ' · ' + etiqueta : ''}${state.canal !== 'Todos' ? ' · ' + state.canal : ''} `);
+    if (state.paso) { const b = el('button', '', 'Ver todas'); b.addEventListener('click', () => { state.paso = null; pintar(); }); fa.append(b); }
+    const t = $('tpeople'); t.replaceChildren();
+    const hr = el('tr'); ['Nombre', 'Canal', 'Etapa actual', 'Entró', 'En la etapa desde'].forEach((h) => hr.append(el('th', '', h))); t.append(hr);
+    ops.slice().sort((a, b) => b.creado.localeCompare(a.creado)).forEach((o) => {
+      const r = el('tr');
+      const n = el('td'); const a = el('a', '', o.nombre); a.href = `${CRM}/v2/location/${LOC}/contacts/detail/${o.contactId}`; a.target = '_blank'; a.rel = 'noopener'; n.append(a);
+      const e = el('td'); e.append(el('span', 'chip ' + clase(o.info), d.nombreEtapa[o.etapa] || 'Etapa'));
+      r.append(n, el('td', '', o.canal), e, el('td', '', fdia(o.creado)), el('td', '', o.cambioEtapa ? fdia(o.cambioEtapa) : '—'));
+      t.append(r);
+    });
+    if (!ops.length) { const r = el('tr'); const c = el('td', 'msg', 'No hay agendas con este filtro.'); c.colSpan = 5; r.append(c); t.append(r); }
+  }
+
+
+  // ---------- alertas del control ----------
+  const alState = { data: null, corriendo: false };
+  async function cargarAlertas(correr) {
+    alState.corriendo = !!correr; pintarAlertas();
+    try {
+      const r = await fetch('/api/alertas' + (correr ? '?correr=1' : ''), { headers: { 'x-dash-key': key } });
+      if (r.status === 401) return;
+      const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Error');
+      alState.data = d; alState.error = null;
+    } catch (e) { alState.error = 'No se pudo correr el control: ' + e.message; }
+    alState.corriendo = false; pintarAlertas();
+  }
+  $('al-correr').addEventListener('click', () => cargarAlertas(true));
+  function pintarAlertas() {
+    const box = $('alertas'); box.replaceChildren();
+    $('al-correr').disabled = alState.corriendo;
+    $('al-correr').textContent = alState.corriendo ? 'Revisando…' : 'Revisar ahora';
+    const d = alState.data;
+    if (alState.error) { box.append(el('p', 'err', alState.error)); return; }
+    if (!d) { box.append(el('p', 'sub', 'Cargando alertas…')); return; }
+    if (!d.corrida) { box.append(el('p', 'sub', 'El control todavía no corrió. Tocá "Revisar ahora".')); return; }
+    $('al-stamp').textContent = 'Último chequeo ' + new Date(d.corrida).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    const urgentes = d.alertas.filter((a) => a.regla !== 'I'), trabadas = d.alertas.filter((a) => a.regla === 'I');
+    $('al-tit').textContent = urgentes.length ? `Para corregir en GHL: ${urgentes.length}` : 'Para corregir en GHL';
+    if (!urgentes.length) box.append(el('p', 'al-vacio', 'Todo lo reportado y agendado coincide con GHL.'));
+    const fila = (a) => {
+      const row = el('div', 'al');
+      const r = el('span', 'r' + (a.regla === 'I' ? ' i' : ''), a.regla); r.title = a.titulo;
+      const txt = el('div');
+      if (a.link) { const l = el('a', '', a.lead); l.href = a.link; l.target = '_blank'; l.rel = 'noopener'; txt.append(l); } else txt.append(el('b', '', a.lead));
+      txt.append(' · ' + a.detalle);
+      row.append(r, txt);
+      if (a.revision) {
+        const dud = a.revision.veredicto !== 'real';
+        row.append(el('div', 'rev' + (dud ? ' dud' : ''), (dud ? 'Claude duda: ' + a.revision.explicacion + ' ' : 'Claude: ') + (a.revision.arreglo || '')));
+      }
+      return row;
+    };
+    const porQuien = {};
+    urgentes.forEach((a) => (porQuien[a.responsable] = porQuien[a.responsable] || []).push(a));
+    Object.entries(porQuien).sort((a, b) => b[1].length - a[1].length).forEach(([q, lista]) => {
+      box.append(el('div', 'al-quien', `${q} · ${lista.length}`));
+      lista.forEach((a) => box.append(fila(a)));
+    });
+    if (trabadas.length) {
+      const det = el('details', 'al-mas'); det.append(el('summary', '', `${trabadas.length} agendas trabadas más de 48 h sin movimiento (setters)`));
+      trabadas.forEach((a) => det.append(fila(a))); box.append(det);
+    }
+    box.append(el('p', 'al-fuentes', 'Fuentes: ' + Object.entries(d.fuentes || {}).map(([k, v]) => `${k} ${v}`).join(' · ')));
+  }
+  setInterval(() => { if (!document.hidden && key) { cargar(); cargarAlertas(); } }, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && state.data && Date.now() - new Date(state.data.actualizado) > 5 * 60 * 1000) cargar(); });
+
+  if (!key) pedirClave(); else { $('app').hidden = false; }
+  const [a, b] = rango('7d'); state.desde = ymd(a); state.hasta = ymd(b);
+  if (key) { cargar(); cargarAlertas(); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/agendas"
+  to = "/.netlify/functions/agendas"
+  status = 200
+
+[[redirects]]
+  from = "/api/alertas"
+  to = "/.netlify/functions/alertas"
+  status = 200
